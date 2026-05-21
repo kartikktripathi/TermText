@@ -4,7 +4,8 @@ const io = require("socket.io-client");
 const readline = require("readline");
 const chalk = require("chalk");
 const socket = io(
-  process.env.SERVER_URL || "http://localhost:3000"
+  process.env.SERVER_URL ||
+  "https://termtext.onrender.com"
 );
 
 const rl = readline.createInterface({
