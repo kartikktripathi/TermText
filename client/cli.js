@@ -1,11 +1,10 @@
+require("dotenv").config();
 const io = require("socket.io-client");
 const readline = require("readline");
 const chalk = require("chalk");
-
-const SERVER_URL =
-  process.env.SERVER_URL || "http://localhost:3000";
-
-const socket = io(SERVER_URL);
+const socket = io(
+  process.env.SERVER_URL || "http://localhost:3000"
+);
 
 const rl = readline.createInterface({
   input: process.stdin,
