@@ -2,7 +2,7 @@ const io = require("socket.io-client");
 const readline = require("readline");
 const chalk = require("chalk");
 
-const socket = io("http://localhost:3000");
+const socket = io("https://termtext-production.up.railway.app/");
 
 const rl = readline.createInterface({
   input: process.stdin,
