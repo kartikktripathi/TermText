@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 require("dotenv").config();
 const io = require("socket.io-client");
 const readline = require("readline");
