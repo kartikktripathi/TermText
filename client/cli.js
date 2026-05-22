@@ -124,6 +124,13 @@ function startChat() {
 
   rl.on("line", (input) => {
 
+    if (input === "/users") {
+
+      socket.emit("get-users", roomCode);
+
+      return;
+    }
+
     if (input.startsWith("/name ")) {
 
       const newName = input.split("/name ")[1];
@@ -163,4 +170,14 @@ socket.on("message", ({ username, text }) => {
   } else {
     console.log(chalk.blue(`[${username}]`), text);
   }
+});
+
+socket.on("room-users", (users) => {
+  console.log(chalk.cyan("\nUsers in room:"));
+
+  users.forEach((user) => {
+    console.log(`- ${user}`);
+  });
+
+  console.log();
 });

@@ -57,6 +57,14 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("get-users", (roomCode) => {
+    if (!rooms[roomCode]) return;
+    const usernames = rooms[roomCode].users.map(
+      (user) => user.username
+    );
+    socket.emit("room-users", usernames);
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
 
