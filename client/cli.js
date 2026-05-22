@@ -87,12 +87,16 @@ function askAction() {
 }
 
 function createRoom() {
-  socket.emit("create-room", (code) => {
+  socket.emit("create-room", username, (code) => {
+
     roomCode = code;
 
-    console.log(chalk.yellow(`Room Created: ${roomCode}`));
+    console.log(
+      chalk.yellow(`Room Created: ${roomCode}`)
+    );
 
     startChat();
+
   });
 }
 
@@ -100,7 +104,7 @@ function joinRoom() {
   rl.question("Enter Room Code: ", (code) => {
     socket.emit(
       "join-room",
-      { roomCode: code },
+      { roomCode: code, username },
       (response) => {
         if (!response.success) {
           console.log(chalk.red(response.message));
@@ -122,10 +126,12 @@ function joinRoom() {
 function startChat() {
   console.log(chalk.cyan("Start chatting...\n"));
 
+  rl.removeAllListeners("line");
+
   rl.on("line", (input) => {
 
     if (input === "/users") {
-
+      console.log("Requesting users...");
       socket.emit("get-users", roomCode);
 
       return;

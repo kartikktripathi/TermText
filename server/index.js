@@ -14,21 +14,26 @@ console.log(`Server running on port ${PORT}`);
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
-  socket.on("create-room", (callback) => {
+  socket.on("create-room", (username, callback) => {
     const roomCode = generateRoomCode();
 
-    rooms[roomCode] = [];
+    rooms[roomCode] = {
+      users: []
+    };
 
     socket.join(roomCode);
 
-    rooms[roomCode].push(socket.id);
+    rooms[roomCode].users.push({
+      socketId: socket.id,
+      username
+    });
 
     callback(roomCode);
 
     console.log(`Room created: ${roomCode}`);
   });
 
-  socket.on("join-room", ({ roomCode }, callback) => {
+  socket.on("join-room", ({ roomCode, username }, callback) => {
     if (!rooms[roomCode]) {
       return callback({
         success: false,
@@ -38,7 +43,10 @@ io.on("connection", (socket) => {
 
     socket.join(roomCode);
 
-    rooms[roomCode].push(socket.id);
+    rooms[roomCode].users.push({
+      socketId: socket.id,
+      username
+    });
 
     callback({
       success: true
@@ -66,16 +74,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
+
     console.log("User disconnected:", socket.id);
 
     for (const roomCode in rooms) {
-      rooms[roomCode] = rooms[roomCode].filter(
-        (id) => id !== socket.id
-      );
 
-      if (rooms[roomCode].length === 0) {
+      rooms[roomCode].users =
+        rooms[roomCode].users.filter(
+          (user) => user.socketId !== socket.id
+        );
+
+      if (rooms[roomCode].users.length === 0) {
+
         delete rooms[roomCode];
-        console.log(`Deleted empty room: ${roomCode}`);
+
+        console.log(
+          `Deleted empty room: ${roomCode}`
+        );
       }
     }
   });
