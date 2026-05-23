@@ -150,6 +150,11 @@ function startChat() {
 
       username = newName;
 
+      socket.emit("update-username", {
+        roomCode,
+        username: newName
+      });
+
       saveUsername(username);
 
       console.log(

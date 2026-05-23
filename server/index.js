@@ -65,6 +65,22 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on(
+    "update-username",
+    ({ roomCode, username }) => {
+
+      if (!rooms[roomCode]) return;
+
+      const user = rooms[roomCode].users.find(
+        (user) => user.socketId === socket.id
+      );
+
+      if (user) {
+        user.username = username;
+      }
+
+  });
+
   socket.on("get-users", (roomCode) => {
     if (!rooms[roomCode]) return;
     const usernames = rooms[roomCode].users.map(
@@ -84,7 +100,7 @@ io.on("connection", (socket) => {
     );
 
     if (user) {
-      
+
       socket.to(roomCode).emit("message", {
         username: "SYSTEM",
         text: `${user.username} left the room`
