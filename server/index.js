@@ -61,7 +61,8 @@ io.on("connection", (socket) => {
   socket.on("message", ({ roomCode, username, text }) => {
     io.to(roomCode).emit("message", {
       username,
-      text
+      text,
+      timestamp: Date.now()
     });
   });
 

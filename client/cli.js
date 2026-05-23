@@ -175,11 +175,19 @@ function startChat() {
   });
 }
 
-socket.on("message", ({ username, text }) => {
+socket.on("message", ({ username, text, timestamp }) => {
+  const messageTimestamp = new Date(timestamp).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
   if (username === "SYSTEM") {
-    console.log(chalk.magenta(`[${username}] ${text}`));
+    console.log(
+      chalk.gray(`[${messageTimestamp}]`),
+      chalk.magenta(`[${username}] ${text}`)
+    );
   } else {
-    console.log(chalk.blue(`[${username}]`), text);
+    console.log(
+      chalk.gray(`[${messageTimestamp}]`),
+      chalk.blue(`[${username}]`),
+      text
+    );
   }
 });
 
