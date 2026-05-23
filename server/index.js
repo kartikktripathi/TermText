@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
 
     socket.to(roomCode).emit("message", {
       username: "SYSTEM",
-      text: "A user joined the room"
+      text: `${username} joined the room`
     });
   });
 
@@ -75,9 +75,20 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
 
-    console.log("User disconnected:", socket.id);
+  console.log("User disconnected:", socket.id);
 
-    for (const roomCode in rooms) {
+  for (const roomCode in rooms) {
+
+    const user = rooms[roomCode].users.find(
+      (user) => user.socketId === socket.id
+    );
+
+    if (user) {
+      
+      socket.to(roomCode).emit("message", {
+        username: "SYSTEM",
+        text: `${user.username} left the room`
+      });
 
       rooms[roomCode].users =
         rooms[roomCode].users.filter(
@@ -93,7 +104,8 @@ io.on("connection", (socket) => {
         );
       }
     }
-  });
+  }
+});
 });
 
 function generateRoomCode() {
