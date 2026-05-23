@@ -176,8 +176,8 @@ function startChat() {
   });
 }
 
-socket.on("message", ({ username: sender, text, timestamp }) => {
-  if (sender !== "SYSTEM" && sender !== username) {
+socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => {
+  if (sender !== "SYSTEM" && senderSocketId !== socket.id) {
 
     player.play(
       path.join(__dirname, "notification.mp3"),
