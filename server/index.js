@@ -53,6 +53,7 @@ io.on("connection", (socket) => {
     });
 
     socket.to(roomCode).emit("message", {
+      timestamp: Date.now(),
       username: "SYSTEM",
       text: `${username} joined the room`
     });
@@ -103,6 +104,7 @@ io.on("connection", (socket) => {
     if (user) {
 
       socket.to(roomCode).emit("message", {
+        timestamp: Date.now(),
         username: "SYSTEM",
         text: `${user.username} left the room`
       });

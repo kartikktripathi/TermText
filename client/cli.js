@@ -187,7 +187,18 @@ socket.on("message", ({ username: sender, text, timestamp }) => {
     );
 
   }
-  const messageTimestamp = new Date(timestamp).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
+  const messageTimestamp = sender === "SYSTEM"
+    ? new Date(timestamp).toLocaleString([], {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      })
+    : new Date(timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
   if (sender === "SYSTEM") {
     console.log(
       chalk.gray(`[${messageTimestamp}]`),
