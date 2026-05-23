@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 require("dotenv").config();
+const player = require("play-sound")();
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -175,17 +176,27 @@ function startChat() {
   });
 }
 
-socket.on("message", ({ username, text, timestamp }) => {
+socket.on("message", ({ username: sender, text, timestamp }) => {
+  if (sender !== "SYSTEM" && sender !== username) {
+
+    player.play(
+      path.join(__dirname, "notification.mp3"),
+      (err) => {
+        if (err) console.log(err);
+      }
+    );
+
+  }
   const messageTimestamp = new Date(timestamp).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
-  if (username === "SYSTEM") {
+  if (sender === "SYSTEM") {
     console.log(
       chalk.gray(`[${messageTimestamp}]`),
-      chalk.magenta(`[${username}] ${text}`)
+      chalk.magenta(`[${sender}] ${text}`)
     );
   } else {
     console.log(
       chalk.gray(`[${messageTimestamp}]`),
-      chalk.blue(`[${username}]`),
+      chalk.blue(`[${sender}]`),
       text
     );
   }
