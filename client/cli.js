@@ -223,11 +223,24 @@ function startChat() {
       );
     }
 
-    socket.emit("message", {
-      roomCode,
-      username,
-      text: input
-    });
+    if (activeDM) {
+
+      socket.emit("private-message", {
+        roomCode,
+        targetUserId: activeDM,
+        username,
+        text: input
+      });
+
+    } else {
+
+      socket.emit("message", {
+        roomCode,
+        username,
+        text: input
+      });
+
+    }
 
   });
 }
@@ -267,6 +280,30 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => 
       text
     );
   }
+});
+
+socket.on(
+  "private-message",
+  ({ username, text, timestamp }) => {
+
+    const messageTimestamp =
+      new Date(timestamp)
+        .toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+    process.stdout.write("\x07");
+
+    console.log(
+      chalk.gray(
+        `[${messageTimestamp}]`
+      ),
+      chalk.magenta(
+        `[PRIVATE] [${username}]`
+      ),
+      text
+    );
 });
 
 socket.on("room-users", (users) => {

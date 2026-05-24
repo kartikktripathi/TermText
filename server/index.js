@@ -81,6 +81,35 @@ io.on("connection", (socket) => {
   });
 
   socket.on(
+    "private-message",
+    ({
+      roomCode,
+      targetUserId,
+      username,
+      text
+    }) => {
+
+      if (!rooms[roomCode]) return;
+
+      const targetUser =
+        rooms[roomCode].users.find(
+          (user) =>
+            user.userId === targetUserId
+        );
+
+      if (!targetUser) return;
+
+      io.to(targetUser.socketId).emit(
+        "private-message",
+        {
+          username,
+          text,
+          timestamp: Date.now()
+        }
+      );
+  });
+
+  socket.on(
     "update-username",
     ({ roomCode, username }) => {
 
