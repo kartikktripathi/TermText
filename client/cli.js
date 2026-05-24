@@ -45,6 +45,7 @@ const rl = readline.createInterface({
 let username = "";
 let roomCode = "";
 let activeDM = null;
+let roomUsers = [];
 
 socket.on("connect", () => {
   console.log(chalk.green("Connected to server"));
@@ -142,12 +143,25 @@ function startChat() {
     if (input.startsWith("/dm ")) {
 
       const targetUserId =
-        input.split("/dm ")[1];
+        input.split("/dm ")[1].trim();
 
       if (!targetUserId) {
 
         console.log(
           chalk.red("Provide a user ID")
+        );
+
+        return;
+      }
+
+      const userExists = roomUsers.some(
+        (user) => user.includes(`(${targetUserId})`)
+      );
+
+      if (!userExists) {
+
+        console.log(
+          chalk.red("Invalid user ID")
         );
 
         return;
@@ -307,6 +321,9 @@ socket.on(
 });
 
 socket.on("room-users", (users) => {
+
+  roomUsers = users;
+
   console.log(chalk.cyan("\nUsers in room:"));
 
   users.forEach((user) => {
