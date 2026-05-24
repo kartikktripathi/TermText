@@ -23,9 +23,15 @@ io.on("connection", (socket) => {
 
     socket.join(roomCode);
 
+    const userId = generateUserId(
+      username,
+      roomCode
+    );
+
     rooms[roomCode].users.push({
       socketId: socket.id,
-      username
+      username,
+      userId
     });
 
     callback(roomCode);
@@ -43,9 +49,15 @@ io.on("connection", (socket) => {
 
     socket.join(roomCode);
 
+    const userId = generateUserId(
+      username,
+      roomCode
+    );
+
     rooms[roomCode].users.push({
       socketId: socket.id,
-      username
+      username,
+      userId
     });
 
     callback({
@@ -87,7 +99,7 @@ io.on("connection", (socket) => {
   socket.on("get-users", (roomCode) => {
     if (!rooms[roomCode]) return;
     const usernames = rooms[roomCode].users.map(
-      (user) => user.username
+      (user) => `${user.username} (${user.userId})`
     );
     socket.emit("room-users", usernames);
   });
@@ -133,4 +145,15 @@ function generateRoomCode() {
     .toString(36)
     .substring(2, 8)
     .toUpperCase();
+}
+
+function generateUserId(username, roomCode) {
+
+  const firstLetter =
+    username[0].toUpperCase();
+
+  const userNumber =
+    rooms[roomCode].users.length + 1;
+
+  return `${firstLetter}${userNumber}`;
 }
