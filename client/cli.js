@@ -145,6 +145,13 @@ function startChat() {
       const targetUserId =
         input.split("/dm ")[1].trim();
 
+      const selfUser = roomUsers.find(
+        (user) => user.includes(username)
+      );
+
+      const selfUserId =
+        selfUser.match(/\((.*?)\)/)[1];
+
       if (!targetUserId) {
 
         console.log(
@@ -162,6 +169,17 @@ function startChat() {
 
         console.log(
           chalk.red("Invalid user ID")
+        );
+
+        return;
+      }
+
+      if (targetUserId === selfUserId) {
+
+        console.log(
+          chalk.red(
+            "You cannot DM yourself"
+          )
         );
 
         return;
@@ -218,23 +236,6 @@ function startChat() {
       );
 
       return;
-    }
-
-    if (activeDM) {
-
-      console.log(
-        chalk.magenta(
-          `[DM -> ${activeDM}] ${input}`
-        )
-      );
-
-    } else {
-
-      console.log(
-        chalk.cyan(
-          `[ROOM] ${input}`
-        )
-      );
     }
 
     if (activeDM) {
@@ -298,7 +299,7 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => 
 
 socket.on(
   "private-message",
-  ({ username, text, timestamp }) => {
+  ({ username, text, timestamp, type, targetUserId }) => {
 
     const messageTimestamp =
       new Date(timestamp)
@@ -307,17 +308,32 @@ socket.on(
           minute: "2-digit"
         });
 
-    process.stdout.write("\x07");
+    if (type === "incoming") {
 
-    console.log(
-      chalk.gray(
-        `[${messageTimestamp}]`
-      ),
-      chalk.magenta(
-        `[PRIVATE] [${username}]`
-      ),
-      text
-    );
+      console.log(
+        chalk.gray(
+          `[${messageTimestamp}]`
+        ),
+        chalk.magenta(
+          `[PRIVATE FROM ${username}]`
+        ),
+        text
+      );
+
+    } else {
+
+      console.log(
+        chalk.gray(
+          `[${messageTimestamp}]`
+        ),
+        chalk.cyan(
+          `[PRIVATE TO ${targetUserId}]`
+        ),
+        text
+      );
+
+    }
+
 });
 
 socket.on("room-users", (users) => {

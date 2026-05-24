@@ -101,12 +101,27 @@ io.on("connection", (socket) => {
 
       if (!targetUser) return;
 
+      const timestamp = Date.now();
+
       io.to(targetUser.socketId).emit(
         "private-message",
         {
           username,
           text,
-          timestamp: Date.now()
+          timestamp,
+          type: "incoming",
+          targetUserId
+        }
+      );
+
+      socket.emit(
+        "private-message",
+        {
+          username,
+          text,
+          timestamp,
+          type: "outgoing",
+          targetUserId
         }
       );
   });
