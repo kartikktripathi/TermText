@@ -44,6 +44,7 @@ const rl = readline.createInterface({
 
 let username = "";
 let roomCode = "";
+let activeDM = null;
 
 socket.on("connect", () => {
   console.log(chalk.green("Connected to server"));
@@ -138,6 +139,44 @@ function startChat() {
       return;
     }
 
+    if (input.startsWith("/dm ")) {
+
+      const targetUserId =
+        input.split("/dm ")[1];
+
+      if (!targetUserId) {
+
+        console.log(
+          chalk.red("Provide a user ID")
+        );
+
+        return;
+      }
+
+      activeDM = targetUserId;
+
+      console.log(
+        chalk.magenta(
+          `Now chatting privately with ${activeDM}`
+        )
+      );
+
+      return;
+    }
+
+    if (input === "/exit") {
+
+      activeDM = null;
+
+      console.log(
+        chalk.cyan(
+          "Returned to main room"
+        )
+      );
+
+      return;
+    }
+
     if (input.startsWith("/name ")) {
 
       const newName = input.split("/name ")[1];
@@ -165,6 +204,23 @@ function startChat() {
       );
 
       return;
+    }
+
+    if (activeDM) {
+
+      console.log(
+        chalk.magenta(
+          `[DM -> ${activeDM}] ${input}`
+        )
+      );
+
+    } else {
+
+      console.log(
+        chalk.cyan(
+          `[ROOM] ${input}`
+        )
+      );
     }
 
     socket.emit("message", {
