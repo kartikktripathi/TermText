@@ -35,6 +35,7 @@ io.on("connection", (socket) => {
     });
 
     callback(roomCode);
+    emitRoomUsers(roomCode);
 
     console.log(`Room created: ${roomCode}`);
   });
@@ -69,6 +70,7 @@ io.on("connection", (socket) => {
       username: "SYSTEM",
       text: `${username} joined the room`
     });
+    emitRoomUsers(roomCode);
   });
 
   socket.on("message", ({ roomCode, username, text }) => {
@@ -121,9 +123,9 @@ io.on("connection", (socket) => {
 
       if (user) {
         user.username = username;
+        emitRoomUsers(roomCode);
       }
-
-  });
+    });
 
   socket.on("get-users", (roomCode) => {
     if (!rooms[roomCode]) return;
@@ -150,11 +152,16 @@ io.on("connection", (socket) => {
         username: "SYSTEM",
         text: `${user.username} left the room`
       });
+      emitRoomUsers(roomCode);
 
       rooms[roomCode].users =
         rooms[roomCode].users.filter(
           (user) => user.socketId !== socket.id
         );
+      
+      if (rooms[roomCode].users.length > 0) {
+        emitRoomUsers(roomCode);
+      }
 
       if (rooms[roomCode].users.length === 0) {
 
@@ -185,4 +192,19 @@ function generateUserId(username, roomCode) {
     rooms[roomCode].users.length + 1;
 
   return `${firstLetter}${userNumber}`;
+}
+
+function emitRoomUsers(roomCode) {
+
+  if (!rooms[roomCode]) return;
+
+  const users = rooms[roomCode].users.map(
+    (user) =>
+      `${user.username} (${user.userId})`
+  );
+
+  io.to(roomCode).emit(
+    "room-users",
+    users
+  );
 }
