@@ -7,14 +7,8 @@ const os = require("os");
 const io = require("socket.io-client");
 const readline = require("readline");
 const chalk = require("chalk");
-const socket = io(
-  process.env.SERVER_URL ||
-  "https://termtext.onrender.com"
-);
-const CONFIG_PATH = path.join(
-  os.homedir(),
-  ".termtext.json"
-);
+const socket = io(process.env.SERVER_URL || "https://termtext.onrender.com");
+const CONFIG_PATH = path.join(os.homedir(), ".termtext.json");
 
 function loadUsername() {
   try {
@@ -31,15 +25,12 @@ function loadUsername() {
 function saveUsername(username) {
   console.log("Saving username...");
   console.log(CONFIG_PATH);
-  fs.writeFileSync(
-    CONFIG_PATH,
-    JSON.stringify({ username }, null, 2)
-  );
+  fs.writeFileSync(CONFIG_PATH, JSON.stringify({ username }, null, 2));
 }
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 let username = "";
@@ -56,9 +47,7 @@ socket.on("connect", () => {
   if (savedUsername) {
     username = savedUsername;
 
-    console.log(
-      chalk.green(`Welcome back, ${username}`)
-    );
+    console.log(chalk.green(`Welcome back, ${username}`));
 
     askAction();
   } else {
@@ -75,63 +64,51 @@ function askUsername() {
 }
 
 function askAction() {
-  rl.question(
-    "Choose:\n1. Create Room\n2. Join Room\n> ",
-    (choice) => {
-      if (choice === "1") {
-        createRoom();
-      } else if (choice === "2") {
-        joinRoom();
-      } else {
-        console.log("Invalid choice");
-        askAction();
-      }
+  rl.question("Choose:\n1. Create Room\n2. Join Room\n> ", (choice) => {
+    if (choice === "1") {
+      createRoom();
+    } else if (choice === "2") {
+      joinRoom();
+    } else {
+      console.log("Invalid choice");
+      askAction();
     }
-  );
+  });
 }
 
 function createRoom() {
   socket.emit("create-room", username, (code, id) => {
-
     roomCode = code;
     myUserId = id;
 
-    console.log(
-      chalk.yellow(`Room Created: ${roomCode}`)
-    );
+    console.log(chalk.yellow(`Room Created: ${roomCode}`));
 
     startChat();
-
   });
 }
 
 function joinRoom() {
   rl.question("Enter Room Code: ", (code) => {
-    socket.emit(
-      "join-room",
-      { roomCode: code, username },
-      (response) => {
-        if (!response.success) {
-          console.log(chalk.red(response.message));
-          return joinRoom();
-        }
-
-        roomCode = code;
-        myUserId = response.userId;
-
-        console.log(
-          chalk.yellow(`Joined Room: ${roomCode}`)
-        );
-
-        startChat();
+    socket.emit("join-room", { roomCode: code, username }, (response) => {
+      if (!response.success) {
+        console.log(chalk.red(response.message));
+        return joinRoom();
       }
-    );
+
+      roomCode = code;
+      myUserId = response.userId;
+
+      console.log(chalk.yellow(`Joined Room: ${roomCode}`));
+
+      startChat();
+    });
   });
 }
 
 function updatePrompt() {
   if (activeDM) {
-    const targetUserString = roomUsers.find(user => user.includes(`(${activeDM})`)) || activeDM;
+    const targetUserString =
+      roomUsers.find((user) => user.includes(`(${activeDM})`)) || activeDM;
     rl.setPrompt(`[DM : ${targetUserString}] > `);
   } else {
     rl.setPrompt("> ");
@@ -147,11 +124,10 @@ function startChat() {
   rl.prompt();
 
   rl.on("line", (input) => {
-
     readline.moveCursor(process.stdout, 0, -1);
     readline.clearLine(process.stdout, 0);
     readline.cursorTo(process.stdout, 0);
-    
+
     if (input === "/users") {
       console.log(chalk.cyan("\nUsers in room:"));
 
@@ -166,41 +142,28 @@ function startChat() {
     }
 
     if (input.startsWith("/dm ")) {
-
-      const targetUserId =
-        input.split("/dm ")[1].trim();
+      const targetUserId = input.split("/dm ")[1].trim();
 
       const selfUserId = myUserId;
 
       if (!targetUserId) {
-
-        console.log(
-          chalk.red("Provide a user ID")
-        );
+        console.log(chalk.red("Provide a user ID"));
         rl.prompt();
         return;
       }
 
-      const userExists = roomUsers.some(
-        (user) => user.includes(`(${targetUserId})`)
+      const userExists = roomUsers.some((user) =>
+        user.includes(`(${targetUserId})`),
       );
 
       if (!userExists) {
-
-        console.log(
-          chalk.red("Invalid user ID")
-        );
+        console.log(chalk.red("Invalid user ID"));
         rl.prompt();
         return;
       }
 
       if (targetUserId === selfUserId) {
-
-        console.log(
-          chalk.red(
-            "You cannot DM yourself"
-          )
-        );
+        console.log(chalk.red("You cannot DM yourself"));
         rl.prompt();
         return;
       }
@@ -208,37 +171,25 @@ function startChat() {
       activeDM = targetUserId;
       updatePrompt();
 
-      console.log(
-        chalk.magenta(
-          `Now chatting privately with ${activeDM}`
-        )
-      );
+      console.log(chalk.magenta(`Now chatting privately with ${activeDM}`));
       rl.prompt();
       return;
     }
 
     if (input === "/exit") {
-
       activeDM = null;
       updatePrompt();
 
-      console.log(
-        chalk.cyan(
-          "Returned to main room"
-        )
-      );
+      console.log(chalk.cyan("Returned to main room"));
       rl.prompt();
       return;
     }
 
     if (input.startsWith("/name ")) {
-
       const newName = input.split("/name ")[1];
 
       if (!newName) {
-        console.log(
-          chalk.red("Provide a valid username")
-        );
+        console.log(chalk.red("Provide a valid username"));
         rl.prompt();
         return;
       }
@@ -247,7 +198,7 @@ function startChat() {
 
       socket.emit("update-username", {
         roomCode,
-        username: newName
+        username: newName,
       });
 
       saveUsername(username);
@@ -257,130 +208,103 @@ function startChat() {
     }
 
     if (input.trim() === "") {
-      console.log(
-        chalk.red("Invalid Text")
-      );
+      console.log(chalk.red("Invalid Text"));
       rl.prompt();
       return;
     }
 
     if (activeDM) {
-
       socket.emit("private-message", {
         roomCode,
         targetUserId: activeDM,
         username,
-        text: input
+        text: input,
       });
-
     } else {
-
       socket.emit("message", {
         roomCode,
         username,
-        text: input
+        text: input,
       });
-
     }
     rl.prompt();
-
   });
 }
 
-socket.on("message", ({ username: sender, text, timestamp, senderSocketId, senderUserId }) => {
-  if (sender !== "SYSTEM" && senderSocketId !== socket.id) {
-
-    player.play(
-      path.join(__dirname, "notification.mp3"),
-      (err) => {
+socket.on(
+  "message",
+  ({ username: sender, text, timestamp, senderSocketId, senderUserId }) => {
+    if (sender !== "SYSTEM" && senderSocketId !== socket.id) {
+      player.play(path.join(__dirname, "notification.mp3"), (err) => {
         if (err) console.log(err);
-      }
-    );
+      });
+    }
 
-  }
+    const messageTimestamp =
+      sender === "SYSTEM"
+        ? new Date(timestamp).toLocaleString([], {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : new Date(timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-  const messageTimestamp = sender === "SYSTEM"
-    ? new Date(timestamp).toLocaleString([], {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit"
-    })
-    : new Date(timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    readline.cursorTo(process.stdout, 0);
+    readline.clearLine(process.stdout, 0);
 
-  readline.cursorTo(process.stdout, 0);
-  readline.clearLine(process.stdout, 0);
-
-  if (sender === "SYSTEM") {
-    console.log(
-      chalk.gray(`[${messageTimestamp}]`),
-      chalk.magenta(`[${sender}] ${text}`)
-    );
-  } else {
-    console.log(
-      chalk.gray(`[${messageTimestamp}]`),
-      chalk.blue(`[${sender}${senderUserId ? ` (${senderUserId})` : ""}]`),
-      text
-    );
-  }
-  rl.prompt(true);
-});
+    if (sender === "SYSTEM") {
+      console.log(
+        chalk.gray(`[${messageTimestamp}]`),
+        chalk.magenta(`[${sender}] ${text}`),
+      );
+    } else {
+      console.log(
+        chalk.gray(`[${messageTimestamp}]`),
+        chalk.blue(`[${sender}${senderUserId ? ` (${senderUserId})` : ""}]`),
+        text,
+      );
+    }
+    rl.prompt(true);
+  },
+);
 
 socket.on(
   "private-message",
   ({ username, text, timestamp, type, targetUserId }) => {
-
-    const messageTimestamp =
-      new Date(timestamp)
-        .toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit"
-        });
+    const messageTimestamp = new Date(timestamp).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
     readline.cursorTo(process.stdout, 0);
     readline.clearLine(process.stdout, 0);
 
     if (type === "incoming") {
-
-      player.play(
-        path.join(__dirname, "DMnotification.mp3"),
-        (err) => {
-          if (err) console.log(err);
-        }
-      );
+      player.play(path.join(__dirname, "DMnotification.mp3"), (err) => {
+        if (err) console.log(err);
+      });
 
       console.log(
-        chalk.gray(
-          `[${messageTimestamp}]`
-        ),
-        chalk.magenta(
-          `[PRIVATE FROM ${username}]`
-        ),
-        text
+        chalk.gray(`[${messageTimestamp}]`),
+        chalk.magenta(`[PRIVATE FROM ${username}]`),
+        text,
       );
-
     } else {
-
       console.log(
-        chalk.gray(
-          `[${messageTimestamp}]`
-        ),
-        chalk.cyan(
-          `[PRIVATE TO ${targetUserId}]`
-        ),
-        text
+        chalk.gray(`[${messageTimestamp}]`),
+        chalk.cyan(`[PRIVATE TO ${targetUserId}]`),
+        text,
       );
-
     }
     rl.prompt(true);
-  });
+  },
+);
 
 socket.on("room-users", (users) => {
-
   roomUsers = users;
-
-  });
+});
