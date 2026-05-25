@@ -8,6 +8,7 @@ const io = new Server(PORT, {
 });
 
 const rooms = {};
+let userNumber = 1;
 
 console.log(`Server running on port ${PORT}`);
 
@@ -198,9 +199,6 @@ function generateRoomCode() {
     .substring(2, 8)
     .toUpperCase();
 }
-
-let userNumber = 1
-
 function generateUserId(username) {
 
   const firstLetter =
