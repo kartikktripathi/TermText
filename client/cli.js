@@ -46,6 +46,7 @@ let username = "";
 let roomCode = "";
 let activeDM = null;
 let roomUsers = [];
+let myUserId = "";
 
 socket.on("connect", () => {
   console.log(chalk.green("Connected to server"));
@@ -90,9 +91,10 @@ function askAction() {
 }
 
 function createRoom() {
-  socket.emit("create-room", username, (code) => {
+  socket.emit("create-room", username, (code, id) => {
 
     roomCode = code;
+    myUserId = id;
 
     console.log(
       chalk.yellow(`Room Created: ${roomCode}`)
@@ -115,6 +117,7 @@ function joinRoom() {
         }
 
         roomCode = code;
+        myUserId = response.userId;
 
         console.log(
           chalk.yellow(`Joined Room: ${roomCode}`)
@@ -145,12 +148,7 @@ function startChat() {
       const targetUserId =
         input.split("/dm ")[1].trim();
 
-      const selfUser = roomUsers.find(
-        (user) => user.includes(username)
-      );
-
-      const selfUserId =
-        selfUser.match(/\((.*?)\)/)[1];
+      const selfUserId = myUserId;
 
       if (!targetUserId) {
 

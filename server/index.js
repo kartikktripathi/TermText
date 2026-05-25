@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
       userId
     });
 
-    callback(roomCode);
+    callback(roomCode, userId);
     emitRoomUsers(roomCode);
 
     console.log(`Room created: ${roomCode}`);
@@ -62,7 +62,8 @@ io.on("connection", (socket) => {
     });
 
     callback({
-      success: true
+      success: true,
+      userId
     });
 
     socket.to(roomCode).emit("message", {
