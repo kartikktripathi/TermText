@@ -346,6 +346,13 @@ socket.on(
 
     if (type === "incoming") {
 
+      player.play(
+        path.join(__dirname, "DMnotification.mp3"),
+        (err) => {
+          if (err) console.log(err);
+        }
+      );
+
       console.log(
         chalk.gray(
           `[${messageTimestamp}]`
