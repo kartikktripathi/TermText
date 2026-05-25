@@ -145,7 +145,15 @@ io.on("connection", (socket) => {
       );
 
       if (user) {
+        const oldUsername = user.username;
         user.username = username;
+
+        io.to(roomCode).emit("message", {
+          timestamp: Date.now(),
+          username: "SYSTEM",
+          text: `${oldUsername} changed their name to ${username}`
+        });
+
         emitRoomUsers(roomCode);
       }
     });

@@ -242,11 +242,6 @@ function startChat() {
 
       saveUsername(username);
 
-      console.log(
-        chalk.green(
-          `Username changed to ${username}`
-        )
-      );
       rl.prompt();
       return;
     }
@@ -287,16 +282,16 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId, sende
   }
   const messageTimestamp = sender === "SYSTEM"
     ? new Date(timestamp).toLocaleString([], {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      })
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    })
     : new Date(timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      });
+      hour: "2-digit",
+      minute: "2-digit"
+    });
 
   readline.cursorTo(process.stdout, 0);
   readline.clearLine(process.stdout, 0);
@@ -356,7 +351,7 @@ socket.on(
 
     }
     rl.prompt(true);
-});
+  });
 
 socket.on("room-users", (users) => {
 
