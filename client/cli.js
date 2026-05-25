@@ -149,8 +149,14 @@ function startChat() {
   rl.on("line", (input) => {
 
     if (input === "/users") {
-      console.log("Requesting users...");
-      socket.emit("get-users", roomCode);
+      console.log(chalk.cyan("\nUsers in room:"));
+
+      roomUsers.forEach((user) => {
+        console.log(`- ${user}`);
+      });
+
+      console.log();
+
       rl.prompt();
       return;
     }
@@ -357,16 +363,4 @@ socket.on("room-users", (users) => {
 
   roomUsers = users;
 
-  readline.cursorTo(process.stdout, 0);
-  readline.clearLine(process.stdout, 0);
-
-  console.log(chalk.cyan("\nUsers in room:"));
-
-  users.forEach((user) => {
-    console.log(`- ${user}`);
   });
-
-  console.log();
-  updatePrompt();
-  rl.prompt(true);
-});
