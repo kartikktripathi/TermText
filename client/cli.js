@@ -274,7 +274,7 @@ function startChat() {
   });
 }
 
-socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => {
+socket.on("message", ({ username: sender, text, timestamp, senderSocketId, senderUserId }) => {
   if (sender !== "SYSTEM" && senderSocketId !== socket.id) {
 
     player.play(
@@ -309,7 +309,7 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => 
   } else {
     console.log(
       chalk.gray(`[${messageTimestamp}]`),
-      chalk.blue(`[${sender}]`),
+      chalk.blue(`[${sender}${senderUserId ? ` (${senderUserId})` : ""}]`),
       text
     );
   }

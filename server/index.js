@@ -76,11 +76,17 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", ({ roomCode, username, text }) => {
+    const senderUser = rooms[roomCode]
+      ? rooms[roomCode].users.find((user) => user.socketId === socket.id)
+      : null;
+    const senderUserId = senderUser ? senderUser.userId : "";
+
     io.to(roomCode).emit("message", {
       username,
       text,
       timestamp: Date.now(),
-      senderSocketId: socket.id
+      senderSocketId: socket.id,
+      senderUserId
     });
   });
 
