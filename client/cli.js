@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 require("dotenv").config();
-const player = require("play-sound")();
+const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
@@ -235,9 +235,23 @@ socket.on(
   "message",
   ({ username: sender, text, timestamp, senderSocketId, senderUserId }) => {
     if (sender !== "SYSTEM" && senderSocketId !== socket.id) {
-      player.play(path.join(__dirname, "notification.mp3"), (err) => {
-        if (err) console.log(err);
-      });
+      const soundPath = path.join(
+        __dirname,
+        "notification.mp3"
+      );
+
+      if (process.platform === "darwin") {
+
+        exec(`afplay "${soundPath}"`);
+
+      } else if (process.platform === "win32") {
+
+        exec(`powershell -c "Add-Type -AssemblyName PresentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open('${soundPath.replace(/\\/g, "/")}'); $p.Play(); Start-Sleep -s 2"`);
+
+      } else {
+
+        process.stdout.write("\x07");
+      }
     }
 
     const messageTimestamp =
@@ -285,9 +299,24 @@ socket.on(
     readline.clearLine(process.stdout, 0);
 
     if (type === "incoming") {
-      player.play(path.join(__dirname, "DMnotification.mp3"), (err) => {
-        if (err) console.log(err);
-      });
+      const soundPath = path.join(
+        __dirname,
+        "DMnotification.mp3"
+      );
+
+      if (process.platform === "darwin") {
+
+        exec(`afplay "${soundPath}"`);
+
+      } else if (process.platform === "win32") {
+
+        exec(`powershell -c "Add-Type -AssemblyName PresentationCore; $p = New-Object System.Windows.Media.MediaPlayer; $p.Open('${soundPath.replace(/\\/g, "/")}'); $p.Play(); Start-Sleep -s 2"`);
+
+      } else {
+
+        process.stdout.write("\x07");
+        
+      }
 
       console.log(
         chalk.gray(`[${messageTimestamp}]`),
