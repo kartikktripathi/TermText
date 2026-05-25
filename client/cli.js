@@ -148,6 +148,10 @@ function startChat() {
 
   rl.on("line", (input) => {
 
+    readline.moveCursor(process.stdout, 0, -1);
+    readline.clearLine(process.stdout, 0);
+    readline.cursorTo(process.stdout, 0);
+    
     if (input === "/users") {
       console.log(chalk.cyan("\nUsers in room:"));
 
@@ -286,6 +290,7 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId, sende
     );
 
   }
+
   const messageTimestamp = sender === "SYSTEM"
     ? new Date(timestamp).toLocaleString([], {
       year: "numeric",
