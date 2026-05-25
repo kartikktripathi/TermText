@@ -129,17 +129,29 @@ function joinRoom() {
   });
 }
 
+function updatePrompt() {
+  if (activeDM) {
+    const targetUserString = roomUsers.find(user => user.includes(`(${activeDM})`)) || activeDM;
+    rl.setPrompt(`[DM : ${targetUserString}] > `);
+  } else {
+    rl.setPrompt("> ");
+  }
+}
+
 function startChat() {
   console.log(chalk.cyan("Start chatting...\n"));
 
   rl.removeAllListeners("line");
+
+  updatePrompt();
+  rl.prompt();
 
   rl.on("line", (input) => {
 
     if (input === "/users") {
       console.log("Requesting users...");
       socket.emit("get-users", roomCode);
-
+      rl.prompt();
       return;
     }
 
@@ -155,7 +167,7 @@ function startChat() {
         console.log(
           chalk.red("Provide a user ID")
         );
-
+        rl.prompt();
         return;
       }
 
@@ -168,7 +180,7 @@ function startChat() {
         console.log(
           chalk.red("Invalid user ID")
         );
-
+        rl.prompt();
         return;
       }
 
@@ -179,31 +191,33 @@ function startChat() {
             "You cannot DM yourself"
           )
         );
-
+        rl.prompt();
         return;
       }
 
       activeDM = targetUserId;
+      updatePrompt();
 
       console.log(
         chalk.magenta(
           `Now chatting privately with ${activeDM}`
         )
       );
-
+      rl.prompt();
       return;
     }
 
     if (input === "/exit") {
 
       activeDM = null;
+      updatePrompt();
 
       console.log(
         chalk.cyan(
           "Returned to main room"
         )
       );
-
+      rl.prompt();
       return;
     }
 
@@ -215,6 +229,7 @@ function startChat() {
         console.log(
           chalk.red("Provide a valid username")
         );
+        rl.prompt();
         return;
       }
 
@@ -232,7 +247,7 @@ function startChat() {
           `Username changed to ${username}`
         )
       );
-
+      rl.prompt();
       return;
     }
 
@@ -254,6 +269,7 @@ function startChat() {
       });
 
     }
+    rl.prompt();
 
   });
 }
@@ -281,6 +297,10 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => 
         hour: "2-digit",
         minute: "2-digit"
       });
+
+  readline.cursorTo(process.stdout, 0);
+  readline.clearLine(process.stdout, 0);
+
   if (sender === "SYSTEM") {
     console.log(
       chalk.gray(`[${messageTimestamp}]`),
@@ -293,6 +313,7 @@ socket.on("message", ({ username: sender, text, timestamp, senderSocketId }) => 
       text
     );
   }
+  rl.prompt(true);
 });
 
 socket.on(
@@ -305,6 +326,9 @@ socket.on(
           hour: "2-digit",
           minute: "2-digit"
         });
+
+    readline.cursorTo(process.stdout, 0);
+    readline.clearLine(process.stdout, 0);
 
     if (type === "incoming") {
 
@@ -331,12 +355,15 @@ socket.on(
       );
 
     }
-
+    rl.prompt(true);
 });
 
 socket.on("room-users", (users) => {
 
   roomUsers = users;
+
+  readline.cursorTo(process.stdout, 0);
+  readline.clearLine(process.stdout, 0);
 
   console.log(chalk.cyan("\nUsers in room:"));
 
@@ -345,4 +372,6 @@ socket.on("room-users", (users) => {
   });
 
   console.log();
+  updatePrompt();
+  rl.prompt(true);
 });
