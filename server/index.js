@@ -199,15 +199,17 @@ function generateRoomCode() {
     .toUpperCase();
 }
 
-function generateUserId(username, roomCode) {
+let userNumber = 1
+
+function generateUserId(username) {
 
   const firstLetter =
     username[0].toUpperCase();
+  
+  let numberID = userNumber;
+  userNumber++;
 
-  const userNumber =
-    rooms[roomCode].users.length + 1;
-
-  return `${firstLetter}${userNumber}`;
+  return `${firstLetter}${numberID}`;
 }
 
 function emitRoomUsers(roomCode) {
