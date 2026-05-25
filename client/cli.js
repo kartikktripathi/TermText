@@ -256,6 +256,14 @@ function startChat() {
       return;
     }
 
+    if (input.trim() === "") {
+      console.log(
+        chalk.red("Invalid Text")
+      );
+      rl.prompt();
+      return;
+    }
+
     if (activeDM) {
 
       socket.emit("private-message", {
