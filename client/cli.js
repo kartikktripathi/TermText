@@ -176,6 +176,22 @@ function startChat() {
       return;
     }
 
+    if (input === "/leave") {
+
+      console.log(
+        chalk.yellow(
+          "Leaving room..."
+        )
+      );
+
+      socket.disconnect();
+
+      rl.close();
+
+      process.exit(0);
+
+    }
+
     if (input === "/exit") {
       activeDM = null;
       updatePrompt();
@@ -230,6 +246,21 @@ function startChat() {
     rl.prompt();
   });
 }
+
+process.on("SIGINT", () => {
+
+  console.log(
+    chalk.yellow(
+      "\nLeaving room..."
+    )
+  );
+
+  socket.disconnect();
+
+  rl.close();
+
+  process.exit(0);
+});
 
 socket.on(
   "message",
