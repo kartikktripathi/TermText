@@ -4,7 +4,7 @@
 
 TermText is a modern, real-time, terminal-native chat application built with Node.js and Socket.IO. It enables developers to create lightweight chat rooms, communicate instantly through public and private conversations, and collaborate directly from the command line with a clean, keyboard-first experience.
 
-Currently running on **v3.0.2**, TermText is under active development, with multiple future versions and features already planned, including LAN discovery, file sharing, app UI support, and more.
+Currently running on **v3.1.0**, TermText is under active development, with multiple future versions and features already planned, including LAN discovery, file sharing, app UI support, and more.
 
 ---
 
@@ -119,7 +119,6 @@ termtext/
 TermText is under continuous development. Planned and upcoming features include:
 
 - LAN discovery
-- Room exit command
 - User muting
 - Configurable notification sounds
 - File and folder sharing
