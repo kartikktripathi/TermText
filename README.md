@@ -82,6 +82,7 @@ termtext
 | `/dm <userId>` | Starts a private DM session with a user |
 | `/exit` | Exits DM mode and returns to room chat |
 | `/name <newName>` | Updates your username in real-time |
+| `/leave` | Leaves the room chat |
 
 ### Examples
 
@@ -168,7 +169,7 @@ For the developers working together.
 
 ## Version
 
-Current Version: **3.0.2**
+Current Version: **3.1.0**
 
 ---
 
