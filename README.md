@@ -175,4 +175,4 @@ Current Version: **3.1.0**
 
 ## License
 
-MIT License
+[MIT License](https://opensource.org/license/mit)
